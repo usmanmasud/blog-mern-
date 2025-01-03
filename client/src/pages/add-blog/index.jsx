@@ -2,9 +2,11 @@ import React, { useContext } from "react";
 import classes from "./styles.module.css";
 import { GlobalContex } from "../../contex";
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 export default function AddNewBlog() {
     const { formData, setFormData } = useContext(GlobalContex);
+    const navigation = useNavigate()
 
     console.log(formData)
 
@@ -16,6 +18,14 @@ export default function AddNewBlog() {
         })
 
         const results = await response.data;
+
+        if (results) {
+            setFormData({
+                title: '',
+                description: ''
+            })
+            navigation('/')
+        }
 
     }
 
