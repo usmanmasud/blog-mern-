@@ -1,6 +1,8 @@
 import React, { useContext, useEffect } from "react";
 import { GlobalContex } from "../../contex/index";
 import axios from "axios";
+import classes from './styles.module.css';
+import { FaTrash, FaEdit } from 'react-icons/fa'
 
 export default function Home() {
     const { blogList, setBlogList, pendeng, setPending } =
@@ -16,21 +18,40 @@ export default function Home() {
         }
     };
 
+    async function handleDelete(getCurrentId) {
+        // console.log(getCurrentId)
+
+        const response = await axios.delete(
+            `http://localhost:5000/api/blogs/delete/${getCurrentId}`
+        );
+        const result = await response.data;
+
+        if (result?.message) {
+            fetchListOfBlogs();
+            // navigate(0)
+        }
+    }
+    async function handleEdit(getCurrentId) {
+
+    }
+
     useEffect(() => {
         fetchListOfBlogs();
     }, []);
 
     return (
-        <div>
+        <div className={classes.wrapper}>
             <h1>Blog Lists</h1>
             {pendeng ? (
                 <h1>Loading..., please wait!!</h1>
             ) : (
-                <div>
+                <div className={classes.blogList}>
                     {blogList.map((item) => (
-                        <div key={item.id}>
+                        <div key={item._id}>
                             <p>{item.title}</p>
                             <p>{item.description}</p>
+                            <FaEdit onClick={handleEdit} size={30} />
+                            <FaTrash onClick={() => handleDelete(item._id)} size={30} />
                         </div>
                     ))}
                 </div>
