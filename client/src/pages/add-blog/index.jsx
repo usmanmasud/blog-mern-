@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import classes from "./styles.module.css";
 import { GlobalContex } from "../../contex";
+import axios from 'axios'
 
 export default function AddNewBlog() {
     const { formData, setFormData } = useContext(GlobalContex);
@@ -9,6 +10,12 @@ export default function AddNewBlog() {
 
 
     const handleSaveBlog = async () => {
+        const response = await axios.post('http://localhost:5000/api/blogs/add', {
+            title: formData.title,
+            description: formData.description
+        })
+
+        const results = await response.data;
 
     }
 
