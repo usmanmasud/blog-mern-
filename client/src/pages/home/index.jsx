@@ -2,9 +2,11 @@ import React, { useContext, useEffect } from "react";
 import { GlobalContex } from "../../contex/index";
 import axios from "axios";
 import classes from './styles.module.css';
-import { FaTrash, FaEdit } from 'react-icons/fa'
+import { FaTrash, FaEdit } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'
 
 export default function Home() {
+    const navigate = useNavigate();
     const { blogList, setBlogList, pendeng, setPending } =
         useContext(GlobalContex);
     const fetchListOfBlogs = async () => {
@@ -15,6 +17,9 @@ export default function Home() {
         if (result && result.blogList && result.blogList.length) {
             setBlogList(result.blogList);
             setPending(false);
+        } else {
+            setPending(false)
+            setBlogList([])
         }
     };
 
@@ -31,8 +36,10 @@ export default function Home() {
             // navigate(0)
         }
     }
-    async function handleEdit(getCurrentId) {
+    async function handleEdit(getCurrentItem) {
+        // console.log(getCurrentItem);
 
+        navigate('/addblog', { state: { getCurrentItem } })
     }
 
     useEffect(() => {
@@ -42,7 +49,7 @@ export default function Home() {
     return (
         <div className={classes.wrapper}>
             <h1>Blog Lists</h1>
-            {pendeng ? (
+            {blogList && blogList.length ? pendeng ? (
                 <h1>Loading..., please wait!!</h1>
             ) : (
                 <div className={classes.blogList}>
@@ -50,12 +57,12 @@ export default function Home() {
                         <div key={item._id}>
                             <p>{item.title}</p>
                             <p>{item.description}</p>
-                            <FaEdit onClick={handleEdit} size={30} />
+                            <FaEdit onClick={() => handleEdit(item)} size={30} />
                             <FaTrash onClick={() => handleDelete(item._id)} size={30} />
                         </div>
                     ))}
                 </div>
-            )}
+            ) : <h3>No blogs!!</h3>}
         </div>
     );
 }

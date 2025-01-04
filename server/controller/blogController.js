@@ -58,7 +58,7 @@ const deleteBlog = async (req, res) => {
     const findCurrentBlog = await Blog.findByIdAndDelete(id);
 
     if (!findCurrentBlog) {
-      return res.json(404).json({ message: "Blog not found" });
+      return res.status(404).json({ message: "Blog not found" });
     }
 
     return res.status(200).json({ message: "deleted successfully" });
@@ -78,22 +78,21 @@ const updateBlog = async (req, res) => {
   let currentBlogToUpdate;
 
   try {
-    (currentBlogToUpdate = await Blog.findByIdAndUpdate(id)),
-      {
-        title,
-        description,
-      };
+    currentBlogToUpdate = await Blog.findByIdAndUpdate(id, {
+      title,
+      description,
+    });
   } catch (error) {
     console.log(error);
 
-    return res.send(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Something went wrong" });
   }
 
   if (!currentBlogToUpdate) {
     return res.status(500).json({ message: "unable to update" });
   }
 
-  return res.send(200).json({ currentBlogToUpdate });
+  return res.status(200).json({ currentBlogToUpdate });
 };
 
 module.exports = { fetchListOfBlogs, deleteBlog, updateBlog, addNewBlock };

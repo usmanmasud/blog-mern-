@@ -1,37 +1,54 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import classes from "./styles.module.css";
 import { GlobalContex } from "../../contex";
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function AddNewBlog() {
-    const { formData, setFormData } = useContext(GlobalContex);
-    const navigation = useNavigate()
+    const { formData, setFormData, currentEdited, setCurrentEdited } =
+        useContext(GlobalContex);
+    const navigation = useNavigate();
+    const location = useLocation();
 
-    console.log(formData)
-
+    console.log(formData);
 
     const handleSaveBlog = async () => {
-        const response = await axios.post('http://localhost:5000/api/blogs/add', {
-            title: formData.title,
-            description: formData.description
-        })
+        const response = currentEdited
+            ? await axios.put(`http://localhost:5000/api/blogs/update/${location.state.getCurrentItem._id}`, {
+                title: formData.title,
+                description: formData.description,
+            })
+            : await axios.post("http://localhost:5000/api/blogs/add", {
+                title: formData.title,
+                description: formData.description,
+            });
 
         const results = await response.data;
 
         if (results) {
+            setCurrentEdited(false)
             setFormData({
-                title: '',
-                description: ''
-            })
-            navigation('/')
+                title: "",
+                description: "",
+            });
+            navigation("/");
         }
+    };
 
-    }
+    useEffect(() => {
+        if (location.state) {
+            const { getCurrentItem } = location.state;
+            setCurrentEdited(true);
+            setFormData({
+                title: getCurrentItem.title,
+                description: getCurrentItem.description,
+            });
+        }
+    }, [location]);
 
     return (
         <div className={classes.wrapper}>
-            <h1>Add a blog</h1>
+            <h1>{currentEdited ? "Edit blog" : "Add a blog"}</h1>
             <div className={classes.formWrapper}>
                 <input
                     name="title"
@@ -50,7 +67,7 @@ export default function AddNewBlog() {
                         setFormData({ ...formData, description: e.target.value })
                     }
                 />
-                <button onClick={handleSaveBlog}>Add New Blog</button>
+                <button onClick={handleSaveBlog}>{currentEdited ? "edit" : "Add New Blog"}</button>
             </div>
         </div>
     );
